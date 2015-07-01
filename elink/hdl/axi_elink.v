@@ -10,20 +10,16 @@ module axi_elink(/*AUTOARG*/
    m_axi_arid, m_axi_araddr, m_axi_arlen, m_axi_arsize, m_axi_arburst,
    m_axi_arlock, m_axi_arcache, m_axi_arprot, m_axi_arqos,
    m_axi_arvalid, m_axi_rready, s_axi_arready, s_axi_awready,
-   s_axi_bid, s_axi_bresp, s_axi_bvalid, s_axi_rid, s_axi_rdata,
-   s_axi_rlast, s_axi_rresp, s_axi_rvalid, s_axi_wready,
+   s_axi_bresp, s_axi_bvalid, s_axi_rdata,
+   s_axi_rresp, s_axi_rvalid, s_axi_wready,
    // Inputs
    reset, sys_clk, rxi_lclk_p, rxi_lclk_n, rxi_frame_p, rxi_frame_n,
    rxi_data_p, rxi_data_n, txi_wr_wait_p, txi_wr_wait_n,
    txi_rd_wait_p, txi_rd_wait_n, m_axi_aresetn, m_axi_awready,
    m_axi_wready, m_axi_bid, m_axi_bresp, m_axi_bvalid, m_axi_arready,
    m_axi_rid, m_axi_rdata, m_axi_rresp, m_axi_rlast, m_axi_rvalid,
-   s_axi_aresetn, s_axi_arid, s_axi_araddr, s_axi_arburst,
-   s_axi_arcache, s_axi_arlock, s_axi_arlen, s_axi_arprot,
-   s_axi_arqos, s_axi_arsize, s_axi_arvalid, s_axi_awid, s_axi_awaddr,
-   s_axi_awburst, s_axi_awcache, s_axi_awlock, s_axi_awlen,
-   s_axi_awprot, s_axi_awqos, s_axi_awsize, s_axi_awvalid,
-   s_axi_bready, s_axi_rready, s_axi_wid, s_axi_wdata, s_axi_wlast,
+   s_axi_aresetn, s_axi_araddr, s_axi_arvalid, s_axi_awid, s_axi_awaddr,
+   s_axi_awvalid, s_axi_bready, s_axi_rready, s_axi_wdata,
    s_axi_wstrb, s_axi_wvalid
    );
    
@@ -131,49 +127,28 @@ module axi_elink(/*AUTOARG*/
    input 	   s_axi_aresetn;
    
    //Read address channel
-   input [S_IDW-1:0] s_axi_arid;    //write address ID
    input [31:0]    s_axi_araddr;
-   input [1:0] 	   s_axi_arburst;
-   input [3:0] 	   s_axi_arcache;
-   input [1:0] 	   s_axi_arlock;
-   input [7:0] 	   s_axi_arlen;
-   input [2:0] 	   s_axi_arprot;
-   input [3:0] 	   s_axi_arqos;
    output 	   s_axi_arready;
-   input [2:0] 	   s_axi_arsize;
    input 	   s_axi_arvalid;
    
    //Write address channel
-   input [S_IDW-1:0] s_axi_awid;    //write address ID
    input [31:0]    s_axi_awaddr;
-   input [1:0] 	   s_axi_awburst;
-   input [3:0] 	   s_axi_awcache;
-   input [1:0] 	   s_axi_awlock;
-   input [7:0] 	   s_axi_awlen;
-   input [2:0] 	   s_axi_awprot;
-   input [3:0] 	   s_axi_awqos;   
-   input [2:0] 	   s_axi_awsize;
    input 	   s_axi_awvalid;
    output 	   s_axi_awready;
    
    //Buffered write response channel
-   output [S_IDW-1:0] s_axi_bid;    //write address ID
    output [1:0]     s_axi_bresp;
    output 	    s_axi_bvalid;
    input 	    s_axi_bready;
    
    //Read channel
-   output [S_IDW-1:0] s_axi_rid;    //write address ID
    output [31:0]    s_axi_rdata;
-   output 	    s_axi_rlast;   
    output [1:0]     s_axi_rresp;
    output 	    s_axi_rvalid;
    input 	    s_axi_rready;
 
    //Write channel
-   input [S_IDW-1:0]  s_axi_wid;    //write address ID
    input [31:0]     s_axi_wdata;
-   input 	    s_axi_wlast;   
    input [3:0] 	    s_axi_wstrb;
    input 	    s_axi_wvalid;
    output 	    s_axi_wready;
@@ -309,7 +284,7 @@ module axi_elink(/*AUTOARG*/
    //########################################################
    
    defparam esaxi.IDW=S_IDW;
-   esaxi esaxi (.s_axi_aclk		(sys_clk),
+   esaxi_lite esaxi (.s_axi_aclk		(sys_clk),
 		/*AUTOINST*/
 		// Outputs
 		.txwr_access		(txwr_access),
@@ -319,12 +294,9 @@ module axi_elink(/*AUTOARG*/
 		.rxrr_wait		(rxrr_wait),
 		.s_axi_arready		(s_axi_arready),
 		.s_axi_awready		(s_axi_awready),
-		.s_axi_bid		(s_axi_bid[S_IDW-1:0]),
 		.s_axi_bresp		(s_axi_bresp[1:0]),
 		.s_axi_bvalid		(s_axi_bvalid),
-		.s_axi_rid		(s_axi_rid[S_IDW-1:0]),
 		.s_axi_rdata		(s_axi_rdata[31:0]),
-		.s_axi_rlast		(s_axi_rlast),
 		.s_axi_rresp		(s_axi_rresp[1:0]),
 		.s_axi_rvalid		(s_axi_rvalid),
 		.s_axi_wready		(s_axi_wready),
@@ -334,31 +306,12 @@ module axi_elink(/*AUTOARG*/
 		.rxrr_access		(rxrr_access),
 		.rxrr_packet		(rxrr_packet[PW-1:0]),
 		.s_axi_aresetn		(s_axi_aresetn),
-		.s_axi_arid		(s_axi_arid[S_IDW-1:0]),
 		.s_axi_araddr		(s_axi_araddr[31:0]),
-		.s_axi_arburst		(s_axi_arburst[1:0]),
-		.s_axi_arcache		(s_axi_arcache[3:0]),
-		.s_axi_arlock		(s_axi_arlock[1:0]),
-		.s_axi_arlen		(s_axi_arlen[7:0]),
-		.s_axi_arprot		(s_axi_arprot[2:0]),
-		.s_axi_arqos		(s_axi_arqos[3:0]),
-		.s_axi_arsize		(s_axi_arsize[2:0]),
-		.s_axi_arvalid		(s_axi_arvalid),
-		.s_axi_awid		(s_axi_awid[S_IDW-1:0]),
 		.s_axi_awaddr		(s_axi_awaddr[31:0]),
-		.s_axi_awburst		(s_axi_awburst[1:0]),
-		.s_axi_awcache		(s_axi_awcache[3:0]),
-		.s_axi_awlock		(s_axi_awlock[1:0]),
-		.s_axi_awlen		(s_axi_awlen[7:0]),
-		.s_axi_awprot		(s_axi_awprot[2:0]),
-		.s_axi_awqos		(s_axi_awqos[3:0]),
-		.s_axi_awsize		(s_axi_awsize[2:0]),
 		.s_axi_awvalid		(s_axi_awvalid),
 		.s_axi_bready		(s_axi_bready),
 		.s_axi_rready		(s_axi_rready),
-		.s_axi_wid		(s_axi_wid[S_IDW-1:0]),
 		.s_axi_wdata		(s_axi_wdata[31:0]),
-		.s_axi_wlast		(s_axi_wlast),
 		.s_axi_wstrb		(s_axi_wstrb[3:0]),
 		.s_axi_wvalid		(s_axi_wvalid));
 
