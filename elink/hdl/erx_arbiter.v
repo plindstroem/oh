@@ -124,8 +124,10 @@ module erx_arbiter (/*AUTOARG*/
    //Write Path (direct)
    //####################################
 
-   assign rxwr_access        = emmu_access & 
-			       emmu_write;
+   assign rxwr_access        = (emmu_access & 
+			       emmu_write &
+			       (emmu_dstaddr[19:16] == `EGROUP_MMU));
+   
 
    assign rxwr_packet[PW-1:0] = emmu_packet[PW-1:0];
          
