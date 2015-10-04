@@ -5,7 +5,7 @@ module erx (/*AUTOARG*/
    rxrr_access, rxrr_packet, erx_cfg_wait, timeout, mailbox_full,
    mailbox_not_empty,
    // Inputs
-   erx_reset, sys_reset, sys_clk, rx_lclk, rx_lclk_div4,
+   erx_reset,erx_ioreset, sys_reset, sys_clk, rx_lclk, rx_lclk_div4,
    rxi_lclk_p, rxi_lclk_n, rxi_frame_p, rxi_frame_n, rxi_data_p,
    rxi_data_n, rxwr_wait, rxrd_wait, rxrr_wait, erx_cfg_access,
    erx_cfg_packet
@@ -21,7 +21,9 @@ module erx (/*AUTOARG*/
 
    //Synched resets
    input          erx_reset;                   // reset for core logic
-   input          sys_reset;                   // reset for fifos 
+   input          sys_reset;                   // reset for fifos
+   input 	  erx_ioreset;
+   
 
    //Clocks
    input 	  sys_clk;	               // system clock for rx fifos
@@ -87,7 +89,7 @@ module erx (/*AUTOARG*/
    /***********************************************************/
    defparam erx_io.IOSTD_ELINK=IOSTD_ELINK;
    defparam erx_io.ETYPE=ETYPE;   
-   erx_io erx_io (.reset		(erx_reset),
+   erx_io erx_io (.reset		(io_reset),
 		  /*AUTOINST*/
 		  // Outputs
 		  .rx_lclk_pll		(rx_lclk_pll),

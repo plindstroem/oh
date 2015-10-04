@@ -7,7 +7,7 @@ module etx(/*AUTOARG*/
    etx_reset, sys_reset, sys_clk, tx_lclk, tx_lclk90, tx_lclk_div4,
    txi_wr_wait_p, txi_wr_wait_n, txi_rd_wait_p, txi_rd_wait_n,
    txrd_access, txrd_packet, txwr_access, txwr_packet, txrr_access,
-   txrr_packet, etx_cfg_wait
+   txrr_packet, etx_cfg_wait, etx90_reset
    );
    parameter AW          = 32;
    parameter DW          = 32;
@@ -52,6 +52,9 @@ module etx(/*AUTOARG*/
    output 	   etx_cfg_access;
    output [PW-1:0] etx_cfg_packet;
    input 	   etx_cfg_wait;
+
+   input 	   etx90_reset;
+   
          
    /*AUTOOUTPUT*/
    /*AUTOINPUT*/
@@ -83,8 +86,8 @@ module etx(/*AUTOARG*/
 		      .txrd_wait	(txrd_wait),
 		      .txwr_wait	(txwr_wait),
 		      .txrr_wait	(txrr_wait),
-		      .etx_cfg_access	(etx_cfg_access),
-		      .etx_cfg_packet	(etx_cfg_packet[PW-1:0]),
+		      //.etx_cfg_access	(etx_cfg_access),
+		      //.etx_cfg_packet	(etx_cfg_packet[PW-1:0]),
 		      .txrd_fifo_access	(txrd_fifo_access),
 		      .txrd_fifo_packet	(txrd_fifo_packet[PW-1:0]),
 		      .txrr_fifo_access	(txrr_fifo_access),
@@ -158,6 +161,8 @@ module etx(/*AUTOARG*/
 
    defparam etx_io.IOSTD_ELINK=IOSTD_ELINK;
    etx_io etx_io (.reset		(etx_reset),
+		  .etx90_reset (etx90_reset),
+		  
 		  /*AUTOINST*/
 		  // Outputs
 		  .txo_lclk_p		(txo_lclk_p),

@@ -1,8 +1,8 @@
 module ereset (/*AUTOARG*/
    // Outputs
-   etx_reset, erx_reset, sys_reset,
+   etx_reset, erx_reset, sys_reset,etx90_reset,erx_ioreset,
    // Inputs
-   reset, sys_clk, tx_lclk_div4, rx_lclk_div4
+   reset, sys_clk, tx_lclk_div4, rx_lclk_div4,tx_lclk90,rx_lclk
    );
 
    // reset inputs
@@ -12,17 +12,26 @@ module ereset (/*AUTOARG*/
    input   sys_clk;        // system clock
    input   tx_lclk_div4;   // slow clock for TX
    input   rx_lclk_div4;   // slow clock for RX
+   input   tx_lclk90;
+   input   rx_lclk;
+      
 
    //synchronous reset outputs
    output  etx_reset;      // reset for TX slow logic
    output  erx_reset;      // reset for RX slow logic
    output  sys_reset;     // reset for system FIFOs
-
-   wire    erx_resetb;
-   wire    etx_resetb;
-   wire    sys_resetb;
+   output  etx90_reset;
+   output  erx_ioreset;
    
    
+   reg 	   erx_ioresetb;
+   reg 	   erx_resetb;
+   reg 	   etx_resetb;
+   reg 	   sys_resetb;
+   reg 	   etx90_resetb;
+   
+   
+  /* 
    //erx reset synchronizer
    synchronizer sync_erx (.out	 (erx_resetb),
 			  .in	 (1'b1),
@@ -43,10 +52,29 @@ module ereset (/*AUTOARG*/
 			  .clk	 (sys_clk),
 			  .reset (reset)
 			   );
+*/
 
-   assign etx_reset =~etx_resetb;
-   assign erx_reset =~erx_resetb;
-   assign sys_reset =~sys_resetb;
+   always @ (posedge rx_lclk_div4)
+     erx_resetb <= reset;
+
+   always @ (posedge tx_lclk_div4)
+     etx_resetb <= reset;
+   
+   always @ (posedge sys_clk)
+     sys_resetb <= reset;
+
+   always @ (posedge tx_lclk90)
+     etx90_resetb <= reset;
+   
+   always @ (posedge rx_lclk)
+     erx_ioresetb <= reset;
+
+   assign erx_ioreset =erx_ioresetb;
+   assign etx_reset =etx_resetb;
+   assign erx_reset =erx_resetb;
+   assign sys_reset =sys_resetb;
+   assign etx90_reset =etx90_resetb;
+   
    
 endmodule // ereset
 // Local Variables:

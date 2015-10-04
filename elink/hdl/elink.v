@@ -127,6 +127,10 @@ module elink(/*AUTOARG*/
    wire			etx_reset;		// From ereset of ereset.v
    wire			sys_reset;		// From ereset of ereset.v
    wire			txwr_gated_access;	// From ecfg_elink of ecfg_elink.v
+   wire 		etx90_reset;
+   wire 		erx_ioreset;
+   
+   
    // End of automatics
    
    /***********************************************************/
@@ -158,9 +162,13 @@ module elink(/*AUTOARG*/
 		  .etx_reset		(etx_reset),
 		  .erx_reset		(erx_reset),
 		  .sys_reset		(sys_reset),
+		  .etx90_reset         (etx90_reset),
+		  .erx_ioreset(erx_ioreset),
 		  // Inputs
 		  .reset		(reset),
 		  .sys_clk		(sys_clk),
+		  .tx_lclk90(tx_lclk90),
+		  .rx_lclk(rx_lclk),
 		  .tx_lclk_div4		(tx_lclk_div4),
 		  .rx_lclk_div4		(rx_lclk_div4));
    
@@ -197,6 +205,7 @@ module elink(/*AUTOARG*/
 	   .mailbox_not_empty		(mailbox_not_empty),
 	   // Inputs
 	   .erx_reset			(erx_reset),
+	   .erx_ioreset                 (erx_ioreset),
 	   .sys_reset			(sys_reset),
 	   .sys_clk			(sys_clk),
 	   .rx_lclk			(rx_lclk),
@@ -244,6 +253,7 @@ module elink(/*AUTOARG*/
 	   .etx_cfg_access		(etx_cfg_access),
 	   .etx_cfg_packet		(etx_cfg_packet[PW-1:0]),
 	   // Inputs
+	   .etx90_reset                 (etx90_reset),
 	   .etx_reset			(etx_reset),
 	   .sys_reset			(sys_reset),
 	   .sys_clk			(sys_clk),

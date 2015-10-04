@@ -45,8 +45,8 @@ module etx_protocol (/*AUTOARG*/
    
    reg           tx_access;
    reg [PW-1:0]  tx_packet; 
-   wire		 tx_rd_wait_sync;
-   wire 	 tx_wr_wait_sync;
+   reg		 tx_rd_wait_sync;
+   reg 		 tx_wr_wait_sync;
    wire 	 etx_write;
    wire [1:0] 	 etx_datamode;
    wire [3:0]	 etx_ctrlmode;
@@ -62,7 +62,10 @@ module etx_protocol (/*AUTOARG*/
    wire 	 burst_type_match;
    wire [31:0] 	 burst_addr;
    wire 	 burst_addr_match;
-    
+   
+   reg 		 etx_rd_wait_reg;
+   reg 		 etx_wr_wait_reg;
+
    //packet to emesh bundle
    packet2emesh p2m0 (.access_out	(),
 		      .write_out	(etx_write),
@@ -129,7 +132,7 @@ module etx_protocol (/*AUTOARG*/
    //# Wait signals (async)
    //#############################
 
-   synchronizer #(.DW(1)) rd_sync (// Outputs
+/*   synchronizer #(.DW(1)) rd_sync (// Outputs
 				   .out		(tx_rd_wait_sync),
 				   // Inputs
 				   .in		(tx_rd_wait),
@@ -144,11 +147,31 @@ module etx_protocol (/*AUTOARG*/
 				   .clk		(clk),
 				   .reset	(reset)
 				   );
+*/
 
+   always @ (posedge clk)
+      if(reset) begin
+      tx_wr_wait_sync <= 1'b0;
+      tx_rd_wait_sync <= 1'b0;
+      end
+      else begin
+         tx_wr_wait_sync <= tx_wr_wait;
+	 tx_rd_wait_sync <= tx_rd_wait;
+      end
+   
    //Stall for all etx pipeline
-   assign etx_wr_wait = tx_wr_wait_sync | tx_io_wait;
-   assign etx_rd_wait = tx_rd_wait_sync | tx_io_wait;
-        
+   //assign etx_wr_wait = tx_wr_wait_sync | tx_io_wait;
+   //assign etx_rd_wait = tx_rd_wait_sync | tx_io_wait;
+
+   always @ (posedge clk) begin
+      etx_wr_wait_reg <= tx_wr_wait | tx_io_wait;
+      etx_rd_wait_reg <= tx_rd_wait | tx_io_wait;
+   end
+   
+   assign etx_wr_wait = etx_wr_wait_reg;
+   assign etx_rd_wait = etx_rd_wait_reg;       
+
+
 endmodule // etx_protocol
 // Local Variables:
 // verilog-library-directories:("." "../../common/hdl")

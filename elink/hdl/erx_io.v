@@ -67,16 +67,17 @@ module erx_io (/*AUTOARG*/
    wire 	 rxi_lclk;
    wire 	 access_wide;
    reg 		 valid_packet;
-   wire [15:0]   rx_word;
-   reg [15:0] 	 rx_word_sync;
+   reg [15:0]   rx_word;
+   wire [15:0] 	 rx_word_i;
    
    //############
    //# REGS
    //############
    reg [7:0] 	 data_even_reg;   
    reg [7:0] 	 data_odd_reg;
-   wire  	 rx_frame;
-   reg [111:0]   rx_sample; 
+   reg  	 rx_frame;
+   wire 	 rx_frame_i;
+   reg [111:0] 	 rx_sample; 
    reg [6:0] 	 rx_pointer;
    reg 		 access;  
    reg 		 burst;
@@ -87,11 +88,8 @@ module erx_io (/*AUTOARG*/
    wire 	 rx_lclk_iddr;
    wire [9:0] 	 rxi_delay_in;
    wire [9:0] 	 rxi_delay_out;
-   reg 		 reset_sync;
+
    
-   //Reset sync
-   always @ (posedge rx_lclk)
-     reset_sync <= reset;
    
 
     //#####################
@@ -197,7 +195,7 @@ module erx_io (/*AUTOARG*/
 	.out(access_wide),
 	.in(valid_packet),
 	.clk(rx_lclk),
-	.reset(reset_sync));
+	.reset(reset));
 
    
    always @ (posedge rx_lclk_div4)
@@ -322,30 +320,37 @@ module erx_io (/*AUTOARG*/
    genvar        i;
    generate for(i=0; i<8; i=i+1)
      begin : gen_iddr           
-	IDDR #(.DDR_CLK_EDGE  ("SAME_EDGE_PIPELINED"), .SRTYPE("ASYNC"))
+	IDDR #(.DDR_CLK_EDGE  ("SAME_EDGE_PIPELINED"), .SRTYPE("SYNC"))
 	iddr_data (
-		   .Q1 (rx_word[i]),
-		   .Q2 (rx_word[i+8]),
+		   .Q1 (rx_word_i[i]),
+		   .Q2 (rx_word_i[i+8]),
 		   .C  (rx_lclk),//rx_lclk_iddr
 		   .CE (1'b1),
 		   .D  (rxi_delay_out[i]),
-		   .R  (reset_sync),
+		   .R  (reset),
 		   .S  (1'b0)
 		   );
      end
      endgenerate
 
    //FRAME
-   IDDR #(.DDR_CLK_EDGE  ("SAME_EDGE_PIPELINED"), .SRTYPE("ASYNC"))
+   IDDR #(.DDR_CLK_EDGE  ("SAME_EDGE_PIPELINED"), .SRTYPE("SYNC"))
 	iddr_frame (
-		   .Q1 (rx_frame),
+		   .Q1 (rx_frame_i),
 		   .Q2 (),    
 		   .C  (rx_lclk),//rx_lclk_iddr
 		   .CE (1'b1),
 		   .D  (rxi_delay_out[8]),
-		   .R  (reset_sync),
+		   .R  (reset),
 		   .S  (1'b0)
 		   );
+
+   always @ ( posedge rx_lclk )
+     rx_frame <= rx_frame_i;
+
+   always @ ( posedge rx_lclk )
+     rx_word <= rx_word_i;
+   
    
 endmodule // erx_io
 // Local Variables:

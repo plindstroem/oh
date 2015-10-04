@@ -5,7 +5,7 @@ module etx_io (/*AUTOARG*/
    txo_lclk_p, txo_lclk_n, txo_frame_p, txo_frame_n, txo_data_p,
    txo_data_n, tx_io_wait, tx_wr_wait, tx_rd_wait,
    // Inputs
-   reset, tx_lclk, tx_lclk90, txi_wr_wait_p, txi_wr_wait_n,
+   reset, etx90_reset, tx_lclk, tx_lclk90, txi_wr_wait_p, txi_wr_wait_n,
    txi_rd_wait_p, txi_rd_wait_n, tx_packet, tx_access, tx_burst
    );
 
@@ -19,6 +19,7 @@ module etx_io (/*AUTOARG*/
    input        reset;               //reset for io  
    input 	tx_lclk;	     // fast clock for io
    input 	tx_lclk90;           // fast 90deg shifted lclk   
+   input 	etx90_reset;
    
    //###########
    //# eLink pins
@@ -38,6 +39,7 @@ module etx_io (/*AUTOARG*/
    output 	  tx_io_wait;   
    output 	  tx_wr_wait;
    output 	  tx_rd_wait;
+   
    
    //############
    //# REGS
@@ -166,7 +168,7 @@ always @ (posedge tx_lclk)
    //#############################
    //# RESET SYNCHRONIZER
    //#############################       
-   always @ (posedge tx_lclk or posedge reset)
+   always @ (posedge tx_lclk)// or posedge reset)
      if(reset)
        begin
 	  io_reset_in   <= 1'b1;
@@ -177,6 +179,7 @@ always @ (posedge tx_lclk)
 	  io_reset_in  <= 1'b0;
 	  io_reset     <= io_reset_in; 
        end
+
      
    //#############################
    //# ODDR DRIVERS
@@ -212,14 +215,14 @@ always @ (posedge tx_lclk)
 	      );
    
    //LCLK
-   ODDR #(.DDR_CLK_EDGE  ("SAME_EDGE"))
+   ODDR #(.DDR_CLK_EDGE  ("SAME_EDGE"),.SRTYPE("SYNC"))
    oddr_lclk (
 	      .Q  (txo_lclk90),
 	      .C  (tx_lclk90),
 	      .CE (1'b1),
 	      .D1 (1'b1),
 	      .D2 (1'b0),
-	      .R  (io_reset),
+	      .R  (etx90_reset),
 	      .S  (1'b0)
 	      );
 		  

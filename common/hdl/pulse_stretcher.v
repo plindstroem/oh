@@ -3,6 +3,7 @@
  * Can be useful for synchronous clock transfers from fast to slow.
  * 
  */
+
 module pulse_stretcher (/*AUTOARG*/
    // Outputs
    out,
@@ -20,7 +21,7 @@ module pulse_stretcher (/*AUTOARG*/
    reg [DW-1:0] wide_pulse;
    
    
-   always @ (posedge clk or posedge reset)
+   always @ (posedge clk )//or posedge reset)
      if(reset)
        wide_pulse[DW-1:0] <= 'b0;
      else
@@ -29,5 +30,3 @@ module pulse_stretcher (/*AUTOARG*/
    assign out = (|{wide_pulse[DW-1:0],in});
    
 endmodule // pulse_stretcher
-
-  
