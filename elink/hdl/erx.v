@@ -89,7 +89,7 @@ module erx (/*AUTOARG*/
    /***********************************************************/
    defparam erx_io.IOSTD_ELINK=IOSTD_ELINK;
    defparam erx_io.ETYPE=ETYPE;   
-   erx_io erx_io (.reset		(io_reset),
+   erx_io erx_io (.reset		(erx_ioreset),
 		  /*AUTOINST*/
 		  // Outputs
 		  .rx_lclk_pll		(rx_lclk_pll),
